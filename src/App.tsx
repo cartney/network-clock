@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Clock } from './components/Clock';
 import { DateDisplay } from './components/DateDisplay';
-import { syncTime, getSyncedTime, needsSync, getLastSyncTime } from './utils/timeSync';
+import { syncTime, needsSync, getLastSyncTime } from './utils/timeSync';
 import './App.css';
 
 function App() {

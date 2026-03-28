@@ -1,121 +1,99 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import React, { useState, useEffect } from 'react';
+import { Clock } from './components/Clock';
+import { DateDisplay } from './components/DateDisplay';
+import { syncTime, getSyncedTime, needsSync, getLastSyncTime } from './utils/timeSync';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [fontSize, setFontSize] = useState(120);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [lastSync, setLastSync] = useState<Date | null>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  // 初始时间同步
+  useEffect(() => {
+    const performSync = async () => {
+      if (needsSync()) {
+        setIsSyncing(true);
+        try {
+          await syncTime();
+          setLastSync(getLastSyncTime());
+        } catch (error) {
+          console.error('时间同步失败:', error);
+        } finally {
+          setIsSyncing(false);
+        }
+      }
+    };
+
+    performSync();
+    
+    // 每小时自动同步一次
+    const interval = setInterval(performSync, 60 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // 全屏模式切换
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().then(() => {
+        setIsFullscreen(true);
+      }).catch((err) => {
+        console.error('全屏模式失败:', err);
+      });
+    } else {
+      document.exitFullscreen().then(() => {
+        setIsFullscreen(false);
+      });
+    }
+  };
+
+  // 监听全屏状态变化
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  // 字体大小调节
+  const increaseFontSize = () => setFontSize(prev => Math.min(prev + 20, 300));
+  const decreaseFontSize = () => setFontSize(prev => Math.max(prev - 20, 40));
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
+    <div className="app">
+      <div className="clock-container">
+        <Clock fontSize={fontSize} />
+        <DateDisplay fontSize={Math.max(fontSize / 3, 24)} />
+      </div>
+
+      <div className="controls">
+        <button onClick={decreaseFontSize} title="缩小字体">
+          <span>A-</span>
         </button>
-      </section>
+        <button onClick={toggleFullscreen} title={isFullscreen ? '退出全屏' : '全屏模式'}>
+          <span>{isFullscreen ? '⛶' : '⛶'}</span>
+        </button>
+        <button onClick={increaseFontSize} title="放大字体">
+          <span>A+</span>
+        </button>
+      </div>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      <div className="status-bar">
+        {isSyncing && <span className="syncing">同步中...</span>}
+        {lastSync && !isSyncing && (
+          <span className="synced">
+            已同步：{lastSync.toLocaleTimeString('zh-CN')}
+          </span>
+        )}
+        {!lastSync && !isSyncing && (
+          <span className="local">本地时间</span>
+        )}
+      </div>
+    </div>
+  );
 }
 
-export default App
+export default App;

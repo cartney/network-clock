@@ -1,73 +1,52 @@
-# React + TypeScript + Vite
+# Network Clock - 网络时钟应用
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Web 端数字时钟应用，支持时间同步、全屏显示、字体调节等功能。
 
-Currently, two official plugins are available:
+## 技术栈
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **框架**: React 19 + TypeScript
+- **构建工具**: Vite
+- **代码规范**: ESLint + Prettier
+- **样式**: CSS Modules
 
-## React Compiler
+## 功能特性
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### MVP 阶段（阶段一）
+- [x] TK-001: 项目初始化 - React+TS 框架搭建、ESLint 配置
+- [ ] TK-002: 时钟核心组件 - 数字时钟显示、秒级更新
+- [ ] TK-003: 日期组件 - 显示日期、星期、格式化
+- [ ] TK-004: 时间同步逻辑 - 浏览器时间 + 可选 NTP 校准
+- [ ] TK-005: 全屏模式 - 全屏切换、隐藏 UI 元素
+- [ ] TK-006: 字体大小调节 - 滑块/按钮控制字号
+- [ ] TK-007: 基础样式 - 默认主题、响应式布局
+- [ ] TK-008: 测试与优化 - 功能测试、性能优化、Bug 修复
 
-## Expanding the ESLint configuration
+## 快速开始
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+```bash
+# 安装依赖
+npm install
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+# 启动开发服务器
+npm run dev
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+# 构建生产版本
+npm run build
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# 代码检查
+npm run lint
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 开发进度
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- **阶段**: MVP (5-7 天)
+- **开始日期**: 2026-03-28
+- **当前状态**: TK-001 已完成
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 仓库
+
+- GitHub: https://github.com/cartney/network-clock
+
+## License
+
+MIT
